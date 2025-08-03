@@ -40,6 +40,7 @@ cp .env.example .env
 ```
 
 > Edit `.env` with your own MongoDB URI and JWT secret
+> For reference please find .env.example file above
 
 ### 4. Start the Server
 
