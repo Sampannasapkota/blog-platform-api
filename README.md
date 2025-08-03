@@ -79,6 +79,7 @@ npm start
 curl -X POST 'http://localhost:3000/api/blogs' -H 'Authorization: Bearer <your_token>' -H 'Content-Type: application/json' -d '{
   "title": "My First Blog",
   "content": "This is the content of the blog.",
+  "description": "This is the description of the blog.",
   "tags": ["nodejs", "api"]
 }'
 ```
