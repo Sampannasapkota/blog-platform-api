@@ -1,128 +1,31 @@
 const express = require("express");
 const router = express.Router();
-const Blog = require("../models/blogModel");
 const { protect } = require("../middleware/authMiddleware");
+const {
+  getBlogs,
+  getBlog,
+  createBlog,
+  updateBlogPut,
+  updateBlogPatch,
+  deleteBlog,
+} = require("../controllers/blogController");
 
-//get all blogs with filtering, sorting and pagination
+// Get all blogs
+router.get("/", getBlogs);
 
-router.get("/", async (req, res) => {
-  try {
-    const { search, tag, sort, page = 1, limit = 10 } = req.query;
-    const query = {};
-    if (search) query.title = { $regex: search, $options: "i" };
-    if (tag) query.tags = tag;
+// Get specific blog
+router.get("/:id", getBlog);
 
-    const sortOptions = {};
-    if (sort) sortOptions.createdAt = sort === "desc" ? -1 : 1;
+// Create blog
+router.post("/", protect, createBlog);
 
-    const skip = (page - 1) * limit;
+// Update blog - PUT
+router.put("/:id", protect, updateBlogPut);
 
-    const blogs = await Blog.find(query)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limit);
+// Update blog - PATCH
+router.patch("/:id", protect, updateBlogPatch);
 
-    res.json(blogs);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//get specific blog
-router.get("/:id", async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-    if (!blog) return res.status(404).json({ message: "Blog not found" });
-    res.json(blog);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//create blog
-router.post("/", protect, async (req, res) => {
-  try {
-    const blog = new Blog({
-      title: req.body.title,
-      description: req.body.description,
-      content: req.body.content,
-      tags: req.body.tags,
-      user: req.user.id,
-    });
-    const savedBlog = await blog.save();
-    res.status(201).json(savedBlog);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-//update blog - PUT
-
-router.put("/:id", protect, async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
-    }
-
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      req.params.id,
-      {
-        title: req.body.title,
-        description: req.body.description,
-        content: req.body.content,
-        tags: req.body.tags,
-      },
-      { new: true, runValidators: true }
-    );
-
-    res.json(updatedBlog);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-//update blog - PATCH
-router.patch("/:id", protect, async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
-    }
-
-    const updates = {};
-    if (req.body.title) updates.title = req.body.title;
-    if (req.body.description) updates.description = req.body.description;
-    if (req.body.content) updates.content = req.body.content;
-    if (req.body.tags) updates.tags = req.body.tags;
-
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
-      runValidators: true,
-    });
-
-    res.json(updatedBlog);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-//delete blog
-router.delete("/:id", protect, async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
-    }
-
-    await blog.deleteOne({ _id: req.params.id });
-    res.json({ message: "Blog removed" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// Delete blog
+router.delete("/:id", protect, deleteBlog);
 
 module.exports = router;
