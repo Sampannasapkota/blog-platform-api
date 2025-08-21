@@ -4,8 +4,7 @@
 ![Express](https://img.shields.io/badge/Express-4.x-lightgrey)
 ![MongoDB](https://img.shields.io/badge/MongoDB-7.x-green)
 
-A RESTful API for managing blog posts and users — built using **Node.js**, **Express**, and **MongoDB**. Created as part of the **ebPearls Traineeship Program**.
-
+A RESTful API for managing blog posts and users — built using **Node.js**, **Express**, and **MongoDB**.
 ---
 
 ## 🚀 Features
